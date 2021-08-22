@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
+use App\Models\Invitation;
+use App\Notifications\UserVerificationCode;
+use Carbon\Carbon;
 
 class AuthController extends Controller
 {
@@ -54,16 +57,38 @@ class AuthController extends Controller
     {       
         $response = ['status' => true, 'data' => '', 'errors' => []];
 
-        if($request->filled('invitation_token')) {
-            $token = $request->invitation_token;
-            $data = [
-                'user_name' => $request->user_name,
-                'email'     => $request->email,
-                'password'  => bcrypt($request->password),
-            ];
-        } else {
-            $response['status'] = false;
-            $response['message'] = 'You can not register';
+        if($request->filled('token')) {
+            $token = $request->token;
+            $checkToken = Invitation::where('token',$token)->first();
+            if ($checkToken) {
+                $checkUserAlreadyExist = User::where('email', $checkToken->email)->first();
+                if ($checkUserAlreadyExist) {
+                    $response['status'] = false;
+                    $response['message'] = 'User already existed with email and token.';
+                    return response($response);
+                }
+                $data = [
+                    'user_name' => $request->user_name,
+                    'email'     => $checkToken->email,
+                    'password'  => bcrypt($request->password),
+                    'registered_at' => Carbon::now()
+                ];
+                $user = User::create($data);
+                if ($user) {
+                    $verificationCode = mt_rand(000001, 999999);
+                    $user->verification_code = $verificationCode;
+                    $user->save();
+
+                    $user->notify(new UserVerificationCode($verificationCode));
+                    $response['message'] = 'Verification code sent to your email. Please verify you email.';
+                } else {
+                    $response['status'] = false;
+                    $response['message'] = 'Oops something went wrong. User not registered successfully.';
+                }
+            } else {
+                $response['status'] = false;
+                $response['message'] = 'Invitation token invalid.';
+            }
         }
 
         return response($response);

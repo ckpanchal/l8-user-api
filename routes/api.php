@@ -21,4 +21,6 @@ Route::post('register', [AuthController::class, 'register'])->name('api.auth.reg
 
 Route::group(['middleware' => 'jwt.verify'], function ($router) {
 	Route::post('invite-user-for-registration', [UserController::class, 'inviteUserForRegistration'])->name('api.user.inviteUserForRegistration');
+	Route::post('user-verification-code', [UserController::class, 'verifyUser'])->name('api.user.verifyUser');
+	Route::post('update-profile', [UserController::class, 'updateProfile'])->name('api.user.updateProfile');
 });

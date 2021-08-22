@@ -17,7 +17,6 @@ class CreateInvitationsTable extends Migration
             $table->id();
             $table->string('email')->unique();
             $table->text('token')->unique();
-            $table->boolean('is_registered')->unique();
             $table->timestamps();
         });
     }
