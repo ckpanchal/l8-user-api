@@ -14,7 +14,9 @@ use JWTAuth;
 
 class UserController extends Controller
 {
-
+    /**
+     * Custom helper instance
+     */
     protected $customHelper;
 
     public function __construct(CustomHelper $customHelper) {
@@ -22,6 +24,13 @@ class UserController extends Controller
         return $this;
     }
 
+    /**
+     * Handle logic to invite user for registration
+     * 
+     * @param \Illuminate\Http\Request
+     * 
+     * @return json 
+     */
     public function inviteUserForRegistration(Request $request)
     {
         $response = ['status' => true, 'data' => [], 'errors' => []];
@@ -51,6 +60,13 @@ class UserController extends Controller
         return response($response);
     }
 
+    /**
+     * Handle logic to verify user email
+     * 
+     * @param \Illuminate\Http\Request
+     * 
+     * @return json 
+     */
     public function verifyUser(Request $request) 
     {
         $response = ['status' => true, 'data' => [], 'errors' => []];
@@ -59,6 +75,10 @@ class UserController extends Controller
             $user->verification_code = null;
             $user->verified_at = Carbon::now();
             $user->save();
+
+            // Notify user successfull
+            $user->notify(new RegistrationSuccess($user));
+
             $response['message'] = 'You have successfully registered with our app.';
         } else {
             $response['status'] = false;
@@ -67,6 +87,13 @@ class UserController extends Controller
         return response($response);    
     }
 
+    /**
+     * Handle logic to update user profile
+     * 
+     * @param \Illuminate\Http\Request
+     * 
+     * @return json 
+     */
     public function updateProfile(Request $request)
     {
         $response = ['status' => true, 'data' => [], 'errors' => []];
