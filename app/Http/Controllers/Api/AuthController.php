@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use App\Models\Invitation;
 use App\Notifications\UserVerificationCode;
+use App\Http\Requests\Api\LoginRequest;
+use App\Http\Requests\Api\RegistrationRequest;
 use Carbon\Carbon;
 
 class AuthController extends Controller
@@ -16,11 +18,11 @@ class AuthController extends Controller
     /**
      * Get a JWT via given credentials.
      *
-     * @param \Illuminate\Http\Request
+     * @param \App\Http\Requests\Api\LoginRequest
      * 
      * @return \Illuminate\Http\JsonResponse
      */
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
         $response = ['status' => true, 'data' => [], 'errors' => []];
 
@@ -53,11 +55,11 @@ class AuthController extends Controller
     /**
      * Handle logic of user registration
      * 
-     * @param \Illuminate\Http\Request
+     * @param \App\Http\Requests\Api\RegistrationRequest
      * 
      * @return json
      */
-    public function register(Request $request)
+    public function register(RegistrationRequest $request)
     {       
         $response = ['status' => true, 'data' => '', 'errors' => []];
 

@@ -10,6 +10,10 @@ use Illuminate\Support\Str;
 use App\Models\Invitation;
 use Carbon\Carbon;
 use App\Helpers\CustomHelper;
+use App\Http\Requests\Api\UserInvitationRequest;
+use App\Http\Requests\Api\VerifyUserRequest;
+use App\Http\Requests\Api\UserProfileRequest;
+use App\Notifications\RegistrationSuccess;
 use JWTAuth;
 
 class UserController extends Controller
@@ -27,11 +31,11 @@ class UserController extends Controller
     /**
      * Handle logic to invite user for registration
      * 
-     * @param \Illuminate\Http\Request
+     * @param \App\Http\Requests\Api\UserInvitationRequest
      * 
      * @return json 
      */
-    public function inviteUserForRegistration(Request $request)
+    public function inviteUserForRegistration(UserInvitationRequest $request)
     {
         $response = ['status' => true, 'data' => [], 'errors' => []];
         $user = JWTAuth::user();
@@ -63,11 +67,11 @@ class UserController extends Controller
     /**
      * Handle logic to verify user email
      * 
-     * @param \Illuminate\Http\Request
+     * @param \App\Http\Requests\VerifyUserRequest
      * 
      * @return json 
      */
-    public function verifyUser(Request $request) 
+    public function verifyUser(VerifyUserRequest $request) 
     {
         $response = ['status' => true, 'data' => [], 'errors' => []];
         $user = JWTAuth::user();
@@ -90,11 +94,11 @@ class UserController extends Controller
     /**
      * Handle logic to update user profile
      * 
-     * @param \Illuminate\Http\Request
+     * @param \App\Http\Requests\UserProfileRequest
      * 
      * @return json 
      */
-    public function updateProfile(Request $request)
+    public function updateProfile(UserProfileRequest $request)
     {
         $response = ['status' => true, 'data' => [], 'errors' => []];
         $user = JWTAuth::user();
