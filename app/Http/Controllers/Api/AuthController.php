@@ -81,6 +81,12 @@ class AuthController extends Controller
 
                     $user->notify(new UserVerificationCode($verificationCode));
                     $response['message'] = 'Verification code sent to your email. Please verify you email.';
+
+                    if (!$token = auth('api')->attempt(['email' => $checkToken->email,'password' => $request->password])) {
+                        return response()->json(['status' => false, 'errors' => __('auth.failed')], 401);
+                    }
+
+                    return $this->respondWithToken($token, $user);
                 } else {
                     $response['status'] = false;
                     $response['message'] = 'Oops something went wrong. User not registered successfully.';

@@ -8,10 +8,20 @@ use App\Mail\UserInvitation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\Invitation;
+use Carbon\Carbon;
+use App\Helpers\CustomHelper;
 use JWTAuth;
 
 class UserController extends Controller
 {
+
+    protected $customHelper;
+
+    public function __construct(CustomHelper $customHelper) {
+        $this->customHelper = $customHelper;
+        return $this;
+    }
+
     public function inviteUserForRegistration(Request $request)
     {
         $response = ['status' => true, 'data' => [], 'errors' => []];
@@ -41,13 +51,13 @@ class UserController extends Controller
         return response($response);
     }
 
-    public function verifyUser($code) 
+    public function verifyUser(Request $request) 
     {
         $response = ['status' => true, 'data' => [], 'errors' => []];
         $user = JWTAuth::user();
-        if ($user->verification_code == $code) {
+        if ($user->verification_code == $request->code) {
             $user->verification_code = null;
-            $user->verification_at = Carbon::now();
+            $user->verified_at = Carbon::now();
             $user->save();
             $response['message'] = 'You have successfully registered with our app.';
         } else {
@@ -61,6 +71,18 @@ class UserController extends Controller
     {
         $response = ['status' => true, 'data' => [], 'errors' => []];
         $user = JWTAuth::user();
+        $requestData = $request->input();
+        $user->fill($requestData);
+        $user->save();
+        $oldAvatar = $user->avatar;
+        if ($request->file('avatar')) {
+            if (!empty($oldAvatar) && $this->customHelper->fileExists($oldAvatar)) {
+                $this->customHelper->delete($oldAvatar);
+            }
+            $avatar = $request->file('avatar');
+            $filePath = $this->customHelper->storeFile('avatar', $avatar);
+            $user->update(['avatar' => $filePath]);
+        }
         return response($response);
     }
 }
