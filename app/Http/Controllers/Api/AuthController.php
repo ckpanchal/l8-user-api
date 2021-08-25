@@ -77,6 +77,7 @@ class AuthController extends Controller
                     'user_name' => $request->user_name,
                     'email'     => $checkToken->email,
                     'password'  => bcrypt($request->password),
+                    'user_role' => 'user',
                     'registered_at' => Carbon::now()
                 ];
                 $user = User::create($data);

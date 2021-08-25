@@ -25,6 +25,9 @@ class UserProfileRequest extends FormRequest
     public function rules()
     {
         $user = JWTAuth::user();
+        if(!$user) {
+            return [];
+        }
         return [
             'name'      => 'required',
             'email'     => 'nullable|email|unique:users,email,'.$user->id,

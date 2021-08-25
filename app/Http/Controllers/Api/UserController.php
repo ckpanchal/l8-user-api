@@ -40,7 +40,7 @@ class UserController extends Controller
     {
         $response = ['status' => true, 'data' => [], 'errors' => []];
         $user = JWTAuth::user();
-        if ($user && ($user->user_role != 'admin')) {
+        if (!$user || ($user && ($user->user_role != 'admin'))) {
             $response['status'] = false;
             $response['message'] = "You don't have permission to invite user.";
             return response($response);
@@ -76,7 +76,7 @@ class UserController extends Controller
     {
         $response = ['status' => true, 'data' => [], 'errors' => []];
         $user = JWTAuth::user();
-        if ($user->verification_code == $request->code) {
+        if ($user && ($user->verification_code == $request->code)) {
             $user->verification_code = null;
             $user->verified_at = Carbon::now();
             $user->save();
@@ -103,6 +103,11 @@ class UserController extends Controller
     {
         $response = ['status' => true, 'data' => [], 'errors' => []];
         $user = JWTAuth::user();
+        if(!$user) {
+            $response['status'] = false;
+            $response['message'] = 'Oops something went wrong';
+            return response($response);
+        }
         $requestData = $request->input();
         $user->fill($requestData);
         $user->save();
