@@ -14,6 +14,7 @@ use App\Http\Requests\Api\UserInvitationRequest;
 use App\Http\Requests\Api\VerifyUserRequest;
 use App\Http\Requests\Api\UserProfileRequest;
 use App\Notifications\RegistrationSuccess;
+use App\Http\Resources\User\User as UserResource;
 use JWTAuth;
 
 class UserController extends Controller
@@ -114,6 +115,7 @@ class UserController extends Controller
             $filePath = $this->customHelper->storeFile('avatar', $avatar);
             $user->update(['avatar' => $filePath]);
         }
+        $response['data'] = new UserResource($user);
         return response($response);
     }
 }
