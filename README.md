@@ -1,4 +1,4 @@
-## Install AdminLTE in laravel 8
+## Installation Steps
 
 Step 1: Clone repository using `git clone git@github.com:ckpanchal/l8-user-api.git`
 
